@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "342653396398",
+    "project_id": "eligibilite-liva",
+    "storage_bucket": "eligibilite-liva.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:342653396398:android:f9578ba5f0e77c2f51143f",
+        "android_client_info": {
+          "package_name": "com.eligibilite.bank.eligibilite_livret_a"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDWU6W2DQ_oLs6gZ8dE1D36fp_7gKNV3No"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
