@@ -117,7 +117,7 @@ class _MainNavigationFlowState extends ConsumerState<MainNavigationFlow> {
 
   void _goToStep(int step) {
     _pageController.animateToPage(
-      step - 1,
+      step,
       duration: const Duration(milliseconds: 350),
       curve: Curves.easeInOut,
     );
@@ -130,9 +130,9 @@ class _MainNavigationFlowState extends ConsumerState<MainNavigationFlow> {
     // Synchronisation de l'étape du PageController avec l'état Riverpod
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_pageController.hasClients &&
-          _pageController.page?.round() != state.currentStep - 1) {
+          _pageController.page?.round() != state.currentStep) {
         _pageController.animateToPage(
-          state.currentStep - 1,
+          state.currentStep,
           duration: const Duration(milliseconds: 350),
           curve: Curves.easeInOut,
         );
@@ -144,7 +144,13 @@ class _MainNavigationFlowState extends ConsumerState<MainNavigationFlow> {
         controller: _pageController,
         physics: const NeverScrollableScrollPhysics(),
         children: [
-          EligibilityScreen(onNext: () => _goToStep(2)),
+          ProductSelectionScreen(
+            onSelectProduct: () => _goToStep(1),
+          ),
+          EligibilityScreen(
+            onNext: () => _goToStep(2),
+            onBack: () => _goToStep(0),
+          ),
           UserInfoScreen(
             onNext: () => _goToStep(3),
             onBack: () => _goToStep(1),
@@ -157,7 +163,7 @@ class _MainNavigationFlowState extends ConsumerState<MainNavigationFlow> {
             onConfirm: () => _goToStep(5),
             onBack: () => _goToStep(3),
           ),
-          SuccessScreen(onReset: () => _goToStep(1)),
+          SuccessScreen(onReset: () => _goToStep(0)),
         ],
       ),
     );

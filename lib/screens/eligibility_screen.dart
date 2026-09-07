@@ -12,8 +12,9 @@ import '../widgets/theme_toggle_button.dart';
 
 class EligibilityScreen extends ConsumerWidget {
   final VoidCallback? onNext;
+  final VoidCallback? onBack;
 
-  const EligibilityScreen({super.key, this.onNext});
+  const EligibilityScreen({super.key, this.onNext, this.onBack});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -27,11 +28,21 @@ class EligibilityScreen extends ConsumerWidget {
       print("ELIGIBILITY: isApiIneligible=$isApiIneligible");
     }
 
+    final productTitle = state.selectedProduct;
+
     return Scaffold(
       appBar: AppBar(
-        leading: const LogoutButton(),
-        title: const Text("Éligibilité Livret A"),
-        actions: const [ThemeToggleButton()],
+        leading: onBack != null
+            ? IconButton(
+                icon: const Icon(Icons.arrow_back),
+                onPressed: () {
+                  notifier.setStep(0);
+                  onBack!();
+                },
+              )
+            : const LogoutButton(),
+        title: Text("Éligibilité $productTitle"),
+        actions: const [LogoutButton(), ThemeToggleButton()],
       ),
       body: SafeArea(
         child: Column(
@@ -87,9 +98,9 @@ class EligibilityScreen extends ConsumerWidget {
                               children: [
                                 Text(
                                   isApiIneligible
-                                      ? "Client non éligible au Livret A (API)"
+                                      ? "Vous n'êtes pas éligible au $productTitle"
                                       : (criteria.isFullyEligible
-                                            ? "Vous êtes éligible au Livret A !"
+                                            ? "Vous êtes éligible au $productTitle !"
                                             : "Vérification des critères"),
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
@@ -104,9 +115,9 @@ class EligibilityScreen extends ConsumerWidget {
                                 const SizedBox(height: 2),
                                 Text(
                                   isApiIneligible
-                                      ? "Votre dossier bancaire ne comporte pas l'offre 'Livret A'."
+                                      ? "Vous n'êtes pas éligible à l'ouverture d'un $productTitle."
                                       : (criteria.isFullyEligible
-                                            ? "Vous pouvez procéder à l'ouverture de votre compte en toute sécurité."
+                                            ? "Vous pouvez procéder à l'ouverture de votre $productTitle."
                                             : "Selon la réglementation française, tous les critères ci-dessous sont évalués."),
                                   style: const TextStyle(
                                     fontSize: 13,
@@ -131,40 +142,35 @@ class EligibilityScreen extends ConsumerWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Row(
+                          Row(
                             children: [
-                              Icon(
+                              const Icon(
                                 Icons.account_balance_wallet,
                                 color: Colors.amber,
                                 size: 22,
                               ),
-                              SizedBox(width: 8),
-                              Text(
-                                "Avantages du Livret A",
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  "Avantages de l'offre $productTitle",
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                  ),
                                 ),
                               ),
                             ],
                           ),
                           const SizedBox(height: 12),
-                          _buildAdvantageItem(
-                            "Taux garanti : 3.00% net d'impôt",
-                          ),
-                          _buildAdvantageItem(
-                            "Épargne disponible à tout moment sans frais",
-                          ),
-                          _buildAdvantageItem(
-                            "Plafond légal : 22 950 € par personne",
-                          ),
+                          ..._getProductAdvantages(productTitle)
+                              .map((adv) => _buildAdvantageItem(adv)),
                         ],
                       ),
                     ),
                     const SizedBox(height: 24),
 
-                    // Criteria List (Sans Checkboxes)
+                    // Criteria List
                     Text(
                       "Critères réglementaires d'ouverture",
                       style: TextStyle(
@@ -179,13 +185,15 @@ class EligibilityScreen extends ConsumerWidget {
                       context: context,
                       title: "Résidence fiscale en France",
                       subtitle: "Vous êtes domicilié fiscalement en France métropolitaine ou en Outre-Mer.",
-                      isValid: criteria.isTaxResidentInFrance,
+                      isValid: true,
                     ),
 
                     _buildCriterionTile(
                       context: context,
-                      title: "Absence d'autre Livret A",
-                      subtitle: "Vous ne possédez aucun autre Livret A dans un autre établissement bancaire.",
+                      title: "Absence d'autre $productTitle",
+                      subtitle: criteria.hasNoOtherLivretA
+                          ? "Vous ne possédez aucun autre $productTitle actif dans un autre établissement."
+                          : "Vous possédez déja un $productTitle actif dans un autre établissement.",
                       isValid: criteria.hasNoOtherLivretA,
                     ),
 
@@ -200,7 +208,8 @@ class EligibilityScreen extends ConsumerWidget {
                     _buildCriterionTile(
                       context: context,
                       title: "Consentement à la vérification",
-                      subtitle: "J'autorise le contrôle de non-cumul du Livret A auprès de l'Administration Fiscale.",
+                      subtitle:
+                          "J'autorise la vérification des conditions d'ouverture de mon $productTitle.",
                       isValid: criteria.acceptsDataCheck,
                     ),
                   ],
@@ -313,5 +322,61 @@ class EligibilityScreen extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  List<String> _getProductAdvantages(String title) {
+    final lower = title.toLowerCase();
+    if (lower.contains('lep') || lower.contains('populaire')) {
+      return const [
+        "Taux garanti : 4.00% net d'impôt",
+        "Exonéré d'impôt et de prélèvements sociaux",
+        "Plafond légal : 10 000 € par personne",
+      ];
+    } else if (lower.contains('pel')) {
+      return const [
+        "Taux garanti : 2.25% brut",
+        "Épargne sécurisée pour projet immobilier",
+        "Plafond légal : 61 200 € par personne",
+      ];
+    } else if (lower.contains('jeune')) {
+      return const [
+        "Taux garanti : 3.00% net d'impôt",
+        "Réservé aux jeunes de 12 à 25 ans",
+        "Plafond légal : 1 600 € par personne",
+      ];
+    } else if (lower.contains('étudiant') || lower.contains('etudiant')) {
+      return const [
+        "0 € / mois de frais de tenue de compte",
+        "Carte de paiement internationale incluse",
+        "Gestion 100% en ligne sur App Mobile",
+      ];
+    } else if (lower.contains('pro')) {
+      return const [
+        "Compte dédié aux indépendants et professionnels",
+        "Outils de facturation & exports comptables",
+        "Multi-cartes professionnelles disponibles",
+      ];
+    } else if (lower.contains('carte') ||
+        lower.contains('mastercard') ||
+        lower.contains('visa')) {
+      return const [
+        "Paiements & retraits en France et à l'international",
+        "Plafonds modulables en temps réel",
+        "Assurances et assistances incluses",
+      ];
+    } else if (lower.contains('prêt') ||
+        lower.contains('pret') ||
+        lower.contains('immobilier')) {
+      return const [
+        "Taux fixe préférentiel garanti",
+        "Étude personnalisée sans engagement",
+        "Accompagnement par un conseiller expert",
+      ];
+    }
+    return const [
+      "Taux garanti : 3.00% net d'impôt",
+      "Épargne disponible à tout moment sans frais",
+      "Plafond légal : 22 950 € par personne",
+    ];
   }
 }

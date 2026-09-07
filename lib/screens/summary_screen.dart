@@ -41,7 +41,7 @@ class _SummaryScreenState extends ConsumerState<SummaryScreen> {
     if (!mounted) return;
 
     final notifier = ref.read(livretAProvider.notifier);
-    notifier.confirmAccountOpening();
+    await notifier.confirmAccountOpening();
 
     if (widget.onConfirm != null) {
       widget.onConfirm!();
@@ -140,9 +140,9 @@ class _SummaryScreenState extends ConsumerState<SummaryScreen> {
                             ),
                           ),
                           const SizedBox(height: 6),
-                          const Text(
-                            "Montant qui sera crédité sur votre nouveau Livret A",
-                            style: TextStyle(
+                          Text(
+                            "Montant qui sera crédité sur votre nouveau ${state.selectedProduct}",
+                            style: const TextStyle(
                               color: Colors.white70,
                               fontSize: 13,
                             ),
@@ -269,7 +269,7 @@ class _SummaryScreenState extends ConsumerState<SummaryScreen> {
                           ),
                         ),
                         subtitle: Text(
-                          "Je confirme le virement initial de ${_currencyFormat.format(transfer.initialAmount)} et j'autorise la création officielle de mon Livret A.",
+                          "Je confirme le virement initial de ${_currencyFormat.format(transfer.initialAmount)} et j'autorise la création officielle de mon ${state.selectedProduct}.",
                           style: const TextStyle(
                             fontSize: 13,
                             color: AppTheme.textSecondary,
@@ -286,7 +286,7 @@ class _SummaryScreenState extends ConsumerState<SummaryScreen> {
             Padding(
               padding: const EdgeInsets.all(20),
               child: CustomButton(
-                text: "Ouvrir mon Livret A",
+                text: "Ouvrir mon ${state.selectedProduct}",
                 icon: Icons.check_circle_outline_rounded,
                 isLoading: _isSubmitting,
                 onPressed: _acceptTerms ? _handleConfirmOpening : null,

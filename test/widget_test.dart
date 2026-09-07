@@ -4,7 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:eligibilite_livret_a/main.dart';
 
 void main() {
-  testWidgets('App starts on step 1 eligibility screen with Riverpod', (WidgetTester tester) async {
+  testWidgets('App starts on product selection screen with Riverpod', (WidgetTester tester) async {
     await tester.pumpWidget(
       const ProviderScope(
         child: MaterialApp(
@@ -13,6 +13,6 @@ void main() {
       ),
     );
 
-    expect(find.text("Éligibilité Livret A"), findsOneWidget);
+    expect(find.text("Offres & Livrets"), findsOneWidget);
   });
 }

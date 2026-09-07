@@ -68,7 +68,7 @@ class SuccessScreen extends ConsumerWidget {
 
                 // Titre principal
                 Text(
-                  "Demande Non Éligible",
+                  "Vous n'êtes pas Éligible",
                   style: Theme.of(context).textTheme.displayMedium?.copyWith(
                     fontWeight: FontWeight.w800,
                     color: AppTheme.error,
@@ -101,30 +101,9 @@ class SuccessScreen extends ConsumerWidget {
                   ),
                   child: Column(
                     children: [
-                      const Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.warning_amber_rounded,
-                            color: AppTheme.error,
-                            size: 22,
-                          ),
-                          SizedBox(width: 8),
-                          Text(
-                            "ALERTE D'INÉLIGIBILITÉ",
-                            style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.bold,
-                              letterSpacing: 1.0,
-                              color: AppTheme.error,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-                      const Text(
-                        "Le client n'est pas éligible à l'ouverture d'un Livret A.",
-                        style: TextStyle(
+                      Text(
+                        "Vous n'êtes pas éligible à l'ouverture de : ${state.selectedProduct}.",
+                        style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w800,
                           color: AppTheme.primary,
@@ -132,9 +111,9 @@ class SuccessScreen extends ConsumerWidget {
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 8),
-                      const Text(
-                        "L'offre 'Livret A' n'apparaît pas dans la liste des offres bancaires autorisées pour votre profil (tableau offresEligibles).",
-                        style: TextStyle(
+                      Text(
+                        "Les vérifications montre que vous n'êtes pas éligible à l'ouverture de votre '${state.selectedProduct}'.",
+                        style: const TextStyle(
                           fontSize: 13,
                           color: AppTheme.textSecondary,
                         ),
@@ -171,7 +150,54 @@ class SuccessScreen extends ConsumerWidget {
                     ],
                   ),
                 ),
-                const SizedBox(height: 32),
+                const SizedBox(height: 24),
+
+                // Regulatory Criteria List
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    "Évaluation des critères réglementaires :",
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).textTheme.titleMedium?.color,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+
+                _buildCriterionTile(
+                  context: context,
+                  title: "Résidence fiscale en France",
+                  subtitle: "Vous êtes domicilié fiscalement en France métropolitaine ou en Outre-Mer.",
+                  isValid: true,
+                ),
+
+                _buildCriterionTile(
+                  context: context,
+                  title: "Éligibilité à l'offre ${state.selectedProduct}",
+                  subtitle:
+                      "L'offre '${state.selectedProduct}' n'est pas présente dans vos offres autorisées.",
+                  isValid: false,
+                ),
+
+                _buildCriterionTile(
+                  context: context,
+                  title: "Capacité juridique",
+                  subtitle:
+                      "Vous êtes majeur ou représentant légal d'un mineur.",
+                  isValid: true,
+                ),
+
+                _buildCriterionTile(
+                  context: context,
+                  title: "Consentement à la vérification",
+                  subtitle:
+                      "J'autorise la vérification des conditions d'ouverture de mon ${state.selectedProduct}.",
+                  isValid: true,
+                ),
+
+                const SizedBox(height: 24),
 
                 // CTA pour rediriger à la 1ère page: Éligibilité
                 CustomButton(
@@ -231,7 +257,7 @@ class SuccessScreen extends ConsumerWidget {
 
               // Title
               Text(
-                "Livret A Ouvert !",
+                "${state.selectedProduct} Ouvert !",
                 style: Theme.of(context).textTheme.displayMedium?.copyWith(
                   fontWeight: FontWeight.w800,
                   color: AppTheme.primary,
@@ -319,13 +345,15 @@ class SuccessScreen extends ConsumerWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text(
-                          "LIVRET A",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w900,
-                            fontSize: 18,
-                            letterSpacing: 1.5,
+                        Expanded(
+                          child: Text(
+                            state.selectedProduct.toUpperCase(),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w900,
+                              fontSize: 16,
+                              letterSpacing: 1.2,
+                            ),
                           ),
                         ),
                         Container(
@@ -338,7 +366,7 @@ class SuccessScreen extends ConsumerWidget {
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: const Text(
-                            "ACTIF • 3,00%",
+                            "ACTIF",
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 11,
@@ -424,8 +452,10 @@ class SuccessScreen extends ConsumerWidget {
                       isOutlined: true,
                       onPressed: () {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text("RIB du Livret A téléchargé en PDF"),
+                          SnackBar(
+                            content: Text(
+                              "RIB de : ${state.selectedProduct} téléchargé en PDF",
+                            ),
                             backgroundColor: AppTheme.primary,
                           ),
                         );
@@ -452,7 +482,7 @@ class SuccessScreen extends ConsumerWidget {
               const SizedBox(height: 12),
 
               CustomButton(
-                text: "Recommencer le parcours",
+                text: "Retour au catalogue des offres",
                 icon: Icons.refresh_rounded,
                 isOutlined: true,
                 onPressed: () {
@@ -462,6 +492,63 @@ class SuccessScreen extends ConsumerWidget {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCriterionTile({
+    required BuildContext context,
+    required String title,
+    required String subtitle,
+    bool isValid = true,
+  }) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 12),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 15,
+                      color: Theme.of(context).textTheme.titleMedium?.color,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    subtitle,
+                    style: const TextStyle(
+                      fontSize: 13,
+                      color: AppTheme.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 12),
+            Container(
+              width: 26,
+              height: 26,
+              decoration: BoxDecoration(
+                color: isValid
+                    ? AppTheme.success
+                    : AppTheme.error.withValues(alpha: 0.12),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                isValid ? Icons.check_rounded : Icons.close_rounded,
+                color: isValid ? Colors.white : AppTheme.error,
+                size: 16,
+              ),
+            ),
+          ],
         ),
       ),
     );

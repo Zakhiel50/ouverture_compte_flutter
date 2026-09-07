@@ -74,6 +74,7 @@ class _UserInfoScreenState extends ConsumerState<UserInfoScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final state = ref.watch(livretAProvider);
     final notifier = ref.read(livretAProvider.notifier);
 
     return Scaffold(
@@ -194,7 +195,7 @@ class _UserInfoScreenState extends ConsumerState<UserInfoScreen> {
                         prefixIcon: Icons.receipt_long_outlined,
                         validator: (val) {
                           if (val == null || val.isEmpty) {
-                            return "Le numéro NIF est obligatoire pour le Livret A";
+                            return "Le numéro NIF est obligatoire pour ${state.selectedProduct}";
                           }
                           return null;
                         },

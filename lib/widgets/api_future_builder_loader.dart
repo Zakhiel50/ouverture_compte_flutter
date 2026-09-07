@@ -65,7 +65,7 @@ class _ApiFutureBuilderLoaderState
                     ),
                     const SizedBox(height: 24),
                     const Text(
-                      "Connexion à l'API bancaire (Riverpod)...",
+                      "Connexion...",
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,

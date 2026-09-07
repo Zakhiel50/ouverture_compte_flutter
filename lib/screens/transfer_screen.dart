@@ -127,14 +127,14 @@ class _TransferScreenState extends ConsumerState<TransferScreen> {
                             color: AppTheme.accent.withValues(alpha: 0.2),
                           ),
                         ),
-                        child: const Row(
+                        child: Row(
                           children: [
-                            Icon(Icons.info_outline, color: AppTheme.accent),
-                            SizedBox(width: 10),
+                            const Icon(Icons.info_outline, color: AppTheme.accent),
+                            const SizedBox(width: 10),
                             Expanded(
                               child: Text(
-                                "Réglementation : Le premier versement sur votre Livret A doit être d'un montant minimum de 10 €.",
-                                style: TextStyle(
+                                "Réglementation : Le premier versement sur votre ${state.selectedProduct} doit être d'un montant minimum de 10 €.",
+                                style: const TextStyle(
                                   fontSize: 13,
                                   color: AppTheme.textPrimary,
                                   fontWeight: FontWeight.w500,
@@ -206,7 +206,7 @@ class _TransferScreenState extends ConsumerState<TransferScreen> {
                             return "Le versement minimum est de 10 €";
                           }
                           if (parsed > 22950.0) {
-                            return "Le plafond légal du Livret A est de 22 950 €";
+                            return "Le plafond légal autorise pour ${state.selectedProduct} est de 22 950 €";
                           }
                           return null;
                         },
